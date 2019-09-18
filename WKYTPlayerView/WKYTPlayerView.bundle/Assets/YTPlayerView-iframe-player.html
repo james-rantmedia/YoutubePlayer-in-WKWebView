@@ -76,9 +76,7 @@
     }
 
     function onPlayerError(event) {
-        if (event.data == 100) {
-            error = true;
-        }
+		error = true;
         window.location.href = 'ytplayer://onError?data=' + event.data;
     }
     

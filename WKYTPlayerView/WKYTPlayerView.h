@@ -153,6 +153,9 @@ typedef NS_ENUM(NSInteger, WKYTPlayerError) {
 /** A delegate to be notified on playback events. */
 @property(nonatomic, weak, nullable) id<WKYTPlayerViewDelegate> delegate;
 
+/** Indicates whether the Youtube iFrame has loaded or not */
+@property(nonatomic, assign) BOOL isPlayerLoaded;
+
 /**
  * This method loads the player with the given video ID.
  * This is a convenience method for calling WKYTPlayerView::loadPlayerWithVideoId:withPlayerVars:

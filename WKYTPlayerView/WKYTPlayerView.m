@@ -66,7 +66,7 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
 
 @property (nonatomic, strong) NSURL *originURL;
 @property (nonatomic, weak) UIView *initialLoadingView;
-@property (nonatomic, weak) UIView *errorView;
+@property (nonatomic, strong) UIView *errorView;
 
 @end
 
@@ -782,6 +782,7 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
         if (self.initialLoadingView) {
             [self.initialLoadingView removeFromSuperview];
         }
+		
 		if (self.errorView) {
 			[self showErrorView];
 		}

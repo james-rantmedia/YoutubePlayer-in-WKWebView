@@ -131,6 +131,20 @@ typedef NS_ENUM(NSInteger, WKYTPlayerError) {
 - (nullable UIView *)playerViewPreferredInitialLoadingView:(nonnull WKYTPlayerView *)playerView;
 
 /**
+ * Callback invoked when initially loading the Youtube iframe to the webview to display a custom
+ * error view when the player iframe has failed to load. The error view will be shown just before
+ * the playerViewIframeAPIDidFailedToLoad: callback is invoked.
+ *
+ * The default implementation does not display any custom error views so the player will display
+ * a blank view with a background color of (-playerViewPreferredWebViewBackgroundColor:).
+ *
+ * @param playerView The WKYTPlayerView instance where the error view will be used.
+ * @return A view object that will be displayed when YouTube iframe API failed to load.
+ *         Pass nil to display no custom loading view. Default implementation returns nil.
+ */
+- (nullable UIView *)playerViewPreferredErrorView:(nonnull WKYTPlayerView *)playerView;
+
+/**
  * Callback invoked when an api loading error has occured.
  *
  * @param playerView The WKYTPlayerView instance where the error has occurred.
@@ -152,9 +166,6 @@ typedef NS_ENUM(NSInteger, WKYTPlayerError) {
 
 /** A delegate to be notified on playback events. */
 @property(nonatomic, weak, nullable) id<WKYTPlayerViewDelegate> delegate;
-
-/** Indicates whether the Youtube iFrame has loaded or not */
-@property(nonatomic, assign) BOOL isPlayerLoaded;
 
 /**
  * This method loads the player with the given video ID.

@@ -66,6 +66,7 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
 
 @property (nonatomic, strong) NSURL *originURL;
 @property (nonatomic, weak) UIView *initialLoadingView;
+@property (nonatomic, strong) UIView *errorView;
 
 @end
 
@@ -723,7 +724,9 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
         if (self.initialLoadingView) {
             [self.initialLoadingView removeFromSuperview];
         }
-		_isPlayerLoaded = true;
+		if (self.errorView.superview) {
+			[self.errorView removeFromSuperview];
+		}
         if ([self.delegate respondsToSelector:@selector(playerViewDidBecomeReady:)]) {
             [self.delegate playerViewDidBecomeReady:self];
         }
@@ -779,7 +782,10 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
         if (self.initialLoadingView) {
             [self.initialLoadingView removeFromSuperview];
         }
-		_isPlayerLoaded = false;
+		
+		if (self.errorView) {
+			[self showErrorView];
+		}
         if ([self.delegate respondsToSelector:@selector(playerViewIframeAPIDidFailedToLoad:)]) {
             [self.delegate playerViewIframeAPIDidFailedToLoad:self];
         }
@@ -846,6 +852,53 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
     }
 }
 
+/**
+ * Adds the custom error view to the view hierarchy if it has been set previously.
+ */
+
+- (void)showErrorView {
+	if (!self.errorView) {
+		return;
+	}
+	
+	if (self.errorView.superview) {
+		[self.errorView removeFromSuperview];
+	}
+	
+	self.errorView.frame = self.bounds;
+	self.errorView.translatesAutoresizingMaskIntoConstraints = NO;
+	[self addSubview:self.errorView];
+	NSLayoutConstraint *topConstraint = [NSLayoutConstraint constraintWithItem:self.errorView
+																	 attribute:NSLayoutAttributeTop
+																	 relatedBy:NSLayoutRelationEqual
+																		toItem:self
+																	 attribute:NSLayoutAttributeTop
+																	multiplier:1.0
+																	  constant:0.0];
+	NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintWithItem:self.errorView
+																	  attribute:NSLayoutAttributeLeft
+																	  relatedBy:NSLayoutRelationEqual
+																		 toItem:self
+																	  attribute:NSLayoutAttributeLeft
+																	 multiplier:1.0
+																	   constant:0.0];
+	NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:self.errorView
+																	   attribute:NSLayoutAttributeRight
+																	   relatedBy:NSLayoutRelationEqual
+																		  toItem:self
+																	   attribute:NSLayoutAttributeRight
+																	  multiplier:1.0
+																		constant:0.0];
+	NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint constraintWithItem:self.errorView
+																		attribute:NSLayoutAttributeBottom
+																		relatedBy:NSLayoutRelationEqual
+																		   toItem:self
+																		attribute:NSLayoutAttributeBottom
+																	   multiplier:1.0
+																		 constant:0.0];
+	NSArray *constraints = @[topConstraint, leftConstraint, rightConstraint, bottomConstraint];
+	[self addConstraints:constraints];
+}
 
 /**
  * Private helper method to load an iframe player with the given player parameters.
@@ -856,7 +909,6 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
  * @return YES if successful, NO if not.
  */
 - (BOOL)loadWithPlayerParams:(NSDictionary *)additionalPlayerParams {
-	_isPlayerLoaded = false;
     NSDictionary *playerCallbacks = @{
                                       @"onReady" : @"onReady",
                                       @"onStateChange" : @"onStateChange",
@@ -1011,6 +1063,13 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
 			[self addConstraints:constraints];
             self.initialLoadingView = initialLoadingView;
         }
+		
+		if ([self.delegate respondsToSelector:@selector(playerViewPreferredErrorView:)]) {
+			UIView *errorView = [self.delegate playerViewPreferredErrorView:self];
+			if (errorView) {
+				self.errorView = errorView;
+			}
+		}
     }
     
     return YES;

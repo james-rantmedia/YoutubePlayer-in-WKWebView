@@ -723,6 +723,7 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
         if (self.initialLoadingView) {
             [self.initialLoadingView removeFromSuperview];
         }
+		_isPlayerLoaded = true;
         if ([self.delegate respondsToSelector:@selector(playerViewDidBecomeReady:)]) {
             [self.delegate playerViewDidBecomeReady:self];
         }
@@ -778,7 +779,7 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
         if (self.initialLoadingView) {
             [self.initialLoadingView removeFromSuperview];
         }
-        
+		_isPlayerLoaded = false;
         if ([self.delegate respondsToSelector:@selector(playerViewIframeAPIDidFailedToLoad:)]) {
             [self.delegate playerViewIframeAPIDidFailedToLoad:self];
         }
@@ -855,6 +856,7 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
  * @return YES if successful, NO if not.
  */
 - (BOOL)loadWithPlayerParams:(NSDictionary *)additionalPlayerParams {
+	_isPlayerLoaded = false;
     NSDictionary *playerCallbacks = @{
                                       @"onReady" : @"onReady",
                                       @"onStateChange" : @"onStateChange",
@@ -975,8 +977,38 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
         UIView *initialLoadingView = [self.delegate playerViewPreferredInitialLoadingView:self];
         if (initialLoadingView) {
             initialLoadingView.frame = self.bounds;
-            initialLoadingView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+			initialLoadingView.translatesAutoresizingMaskIntoConstraints = NO;
             [self addSubview:initialLoadingView];
+			NSLayoutConstraint *topConstraint = [NSLayoutConstraint constraintWithItem:initialLoadingView
+																			 attribute:NSLayoutAttributeTop
+																			 relatedBy:NSLayoutRelationEqual
+																				toItem:self
+																			 attribute:NSLayoutAttributeTop
+																			multiplier:1.0
+																			  constant:0.0];
+			NSLayoutConstraint *leftConstraint = [NSLayoutConstraint constraintWithItem:initialLoadingView
+																			  attribute:NSLayoutAttributeLeft
+																			  relatedBy:NSLayoutRelationEqual
+																				 toItem:self
+																			  attribute:NSLayoutAttributeLeft
+																			 multiplier:1.0
+																			   constant:0.0];
+			NSLayoutConstraint *rightConstraint = [NSLayoutConstraint constraintWithItem:initialLoadingView
+																			   attribute:NSLayoutAttributeRight
+																			   relatedBy:NSLayoutRelationEqual
+																				  toItem:self
+																			   attribute:NSLayoutAttributeRight
+																			  multiplier:1.0
+																				constant:0.0];
+			NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint constraintWithItem:initialLoadingView
+																				attribute:NSLayoutAttributeBottom
+																				relatedBy:NSLayoutRelationEqual
+																				   toItem:self
+																				attribute:NSLayoutAttributeBottom
+																			   multiplier:1.0
+																				 constant:0.0];
+			NSArray *constraints = @[topConstraint, leftConstraint, rightConstraint, bottomConstraint];
+			[self addConstraints:constraints];
             self.initialLoadingView = initialLoadingView;
         }
     }

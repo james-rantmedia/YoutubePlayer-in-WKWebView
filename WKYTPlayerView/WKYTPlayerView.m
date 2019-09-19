@@ -857,7 +857,7 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
 
 - (void)showErrorView {
 	if (!self.errorView) {
-		return
+		return;
 	}
 	
 	if (self.errorView.superview) {
@@ -1068,6 +1068,7 @@ NSString static *const kWKYTPlayerSyndicationRegexPattern = @"^https://tpc.googl
 			if (errorView) {
 				self.errorView = errorView;
 			}
+		}
     }
     
     return YES;
